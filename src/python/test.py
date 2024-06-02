@@ -45,5 +45,18 @@ accounts.json()
 #%%#####################
 ##### TRANSACTIONS #####
 ########################
-transactions = requests.get(f'{base_url}/transactions', headers = headers)
-transactions.json()
+params = {
+    'page[size]': 30,
+    'filter[since]':'2024-02-19T00:00:00+10:00',
+    }
+
+first_request= requests.get(f'{base_url}/transactions', headers = headers)
+transactions = first_request.json()['data']
+all_transactions = transactions.copy()
+links = first_request.json()['links']
+
+while(links['next'] != None):
+    next_request = requests.get(links['next'], headers=headers, params=params)
+    next_transaction = next_request.json()['data']
+    all_transactions.extend(next_transaction)
+    links = next_request.json()['links']
