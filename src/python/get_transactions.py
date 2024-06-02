@@ -27,21 +27,6 @@ if response.status_code == 200:
 else:
     print(f"Error {response.status_code}: {response.text}")
 
-#%%########
-##### #####
-###########
-
-# Accounts
-
-params = {
-   'page[size]': 2,
-   'filter[accountType]': 'SAVER'
-}
-
-accounts = requests.get(f'{base_url}/accounts', headers = headers, params = params)
-# accounts = requests.get(f'{base_url}/accounts', headers = headers)
-accounts.json()
-
 #%%#####################
 ##### TRANSACTIONS #####
 ########################
@@ -50,11 +35,16 @@ params = {
     'filter[since]':'2024-02-19T00:00:00+10:00',
     }
 
+# Get most recent request
 first_request= requests.get(f'{base_url}/transactions', headers = headers)
 transactions = first_request.json()['data']
+# Add to a list for all transactions
 all_transactions = transactions.copy()
+# Get links
 links = first_request.json()['links']
 
+# While there is a next link to click
+# Keep going next, and extend list of transactions
 while(links['next'] != None):
     next_request = requests.get(links['next'], headers=headers, params=params)
     next_transaction = next_request.json()['data']
